@@ -1,0 +1,365 @@
+<div class="page-width">
+  <div class="product-template" data-product-id="{{ product.id }}">
+    <div class="product-template__container">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumbs" aria-label="breadcrumbs">
+        <ol class="breadcrumbs__list">
+          <li class="breadcrumbs__item">
+            <a href="/" class="breadcrumbs__link">Home</a>
+          </li>
+          {% if collection.url %}
+            <li class="breadcrumbs__item">
+              <a href="{{ collection.url }}" class="breadcrumbs__link">{{ collection.title }}</a>
+            </li>
+          {% endif %}
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current" aria-current="page">{{ product.title }}</span>
+          </li>
+        </ol>
+      </nav>
+
+      <div class="product-template__grid">
+        <!-- Product Images -->
+        <div class="product-template__media">
+          <div class="product-media">
+            <!-- Main Image -->
+            <div class="product-media__main">
+              {% if product.featured_media != blank %}
+                <img 
+                  src="{{ product.featured_media | img_url: '800x' }}" 
+                  alt="{{ product.featured_media.alt | escape }}" 
+                  class="product-media__image" 
+                  id="ProductMedia-{{ product.featured_media.id }}"
+                  data-media-id="{{ product.featured_media.id }}"
+                  loading="lazy"
+                >
+              {% else %}
+                <div class="product-media__image placeholder-background">
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Thumbnails -->
+            {% if product.media.size > 1 %}
+              <div class="product-media__thumbnails">
+                {% for media in product.media %}
+                  <button 
+                    type="button" 
+                    class="product-media__thumbnail{% if media.id == product.featured_media.id %} product-media__thumbnail--active{% endif %}" 
+                    data-media-id="{{ media.id }}"
+                    aria-label="{{ media.alt | escape }}"
+                  >
+                    <img 
+                      src="{{ media | img_url: '150x' }}" 
+                      alt="{{ media.alt | escape }}" 
+                      class="product-media__thumbnail-image"
+                      loading="lazy"
+                    >
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="product-template__details">
+          <div class="product-info">
+            <!-- Vendor -->
+            {% if product.vendor != blank and settings.show_vendor %}
+              <div class="product-info__vendor">
+                {{ product.vendor }}
+              </div>
+            {% endif %}
+
+            <!-- Title -->
+            <h1 class="product-info__title">{{ product.title }}</h1>
+
+            <!-- Rating -->
+            <div class="product-info__rating">
+              <div class="rating-stars">
+                <span class="rating-stars__item">★★★★★</span>
+              </div>
+              <a href="#reviews" class="rating-count">{{ product.metafields.reviews.rating_count | default: 0 }} reviews</a>
+            </div>
+
+            <!-- Price -->
+            <div class="product-info__price">
+              {% if product.compare_at_price > product.price %}
+                <span class="product-info__price--sale">
+                  {{ product.price | money }}
+                </span>
+                <span class="product-info__price--regular">
+                  {{ product.compare_at_price | money }}
+                </span>
+                <span class="product-info__badge product-info__badge--sale">
+                  Save {{ product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round }}%
+                </span>
+              {% else %}
+                <span class="product-info__price--regular">
+                  {{ product.price | money }}
+                </span>
+              {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="product-info__description rte">
+              {{ product.description }}
+            </div>
+
+            <!-- Form -->
+            {% form 'product', product, id: 'AddToCartForm', class: 'product-form' %}
+              <!-- Variant Selector -->
+              {% unless product.has_only_default_variant %}
+                <div class="product-form__variants">
+                  {% for option in product.options_with_values %}
+                    <div class="product-form__option">
+                      <label class="product-form__option-label" for="Option-{{ forloop.index }}">
+                        {{ option.name }}
+                      </label>
+                      <select 
+                        id="Option-{{ forloop.index }}" 
+                        class="product-form__option-select" 
+                        name="options[{{ option.name }}]"
+                      >
+                        {% for value in option.values %}
+                          <option 
+                            value="{{ value | escape }}"
+                            {% if option.selected_value == value %}selected="selected"{% endif %}
+                          >
+                            {{ value }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endunless %}
+
+              <!-- Quantity -->
+              <div class="product-form__quantity">
+                <label class="product-form__quantity-label" for="Quantity">Quantity</label>
+                <div class="quantity-selector">
+                  <button type="button" class="quantity-selector__button" data-action="decrease">
+                    <span aria-hidden="true">-</span>
+                    <span class="visually-hidden">Decrease quantity</span>
+                  </button>
+                  <input 
+                    type="number" 
+                    id="Quantity" 
+                    name="quantity" 
+                    class="quantity-selector__input" 
+                    value="1" 
+                    min="1" 
+                    aria-label="Quantity"
+                  >
+                  <button type="button" class="quantity-selector__button" data-action="increase">
+                    <span aria-hidden="true">+</span>
+                    <span class="visually-hidden">Increase quantity</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Submit -->
+              <div class="product-form__submit">
+                <button 
+                  type="submit" 
+                  name="add" 
+                  class="button button--primary button--full-width{% unless product.available %} button--disabled{% endunless %}" 
+                  {% unless product.available %}disabled="disabled"{% endunless %}
+                >
+                  {% if product.available %}
+                    Add to Cart
+                  {% else %}
+                    Sold Out
+                  {% endif %}
+                </button>
+              </div>
+
+              <!-- Buy Now Button -->
+              {% if product.available %}
+                <div class="product-form__buy-now">
+                  <button 
+                    type="button" 
+                    class="button button--secondary button--full-width" 
+                    data-buy-now
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              {% endif %}
+            {% endform %}
+
+            <!-- Product Meta -->
+            <div class="product-meta">
+              <!-- SKU -->
+              {% if product.selected_or_first_available_variant.sku != blank %}
+                <div class="product-meta__item">
+                  <span class="product-meta__label">SKU:</span>
+                  <span class="product-meta__value" data-sku>{{ product.selected_or_first_available_variant.sku }}</span>
+                </div>
+              {% endif %}
+
+              <!-- Availability -->
+              <div class="product-meta__item">
+                <span class="product-meta__label">Availability:</span>
+                <span class="product-meta__value{% if product.available %} product-meta__value--in-stock{% else %} product-meta__value--sold-out{% endif %}">
+                  {% if product.available %}In Stock{% else %}Sold Out{% endif %}
+                </span>
+              </div>
+
+              <!-- Categories -->
+              {% if product.collections.size > 0 %}
+                <div class="product-meta__item">
+                  <span class="product-meta__label">Categories:</span>
+                  <span class="product-meta__value">
+                    {% for collection in product.collections %}
+                      <a href="{{ collection.url }}" class="product-meta__link">{{ collection.title }}</a>{% unless forloop.last %}, {% endunless %}
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+
+              <!-- Tags -->
+              {% if product.tags.size > 0 %}
+                <div class="product-meta__item">
+                  <span class="product-meta__label">Tags:</span>
+                  <span class="product-meta__value">
+                    {% for tag in product.tags %}
+                      <a href="/collections/all/{{ tag | handle }}" class="product-meta__link">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Social Sharing -->
+            <div class="product-share">
+              <span class="product-share__label">Share:</span>
+              <ul class="product-share__list list--inline">
+                <li class="product-share__item">
+                  <a 
+                    href="https://www.facebook.com/sharer.php?u={{ shop.url }}{{ product.url }}" 
+                    class="product-share__link" 
+                    target="_blank" 
+                    rel="noopener"
+                    aria-label="Share on Facebook"
+                  >
+                    <span class="icon-facebook" aria-hidden="true">Facebook</span>
+                  </a>
+                </li>
+                <li class="product-share__item">
+                  <a 
+                    href="https://twitter.com/share?text={{ product.title | url_encode }}&url={{ shop.url }}{{ product.url }}" 
+                    class="product-share__link" 
+                    target="_blank" 
+                    rel="noopener"
+                    aria-label="Share on Twitter"
+                  >
+                    <span class="icon-twitter" aria-hidden="true">Twitter</span>
+                  </a>
+                </li>
+                <li class="product-share__item">
+                  <a 
+                    href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | img_url: '1024x1024' }}&description={{ product.title | url_encode }}" 
+                    class="product-share__link" 
+                    target="_blank" 
+                    rel="noopener"
+                    aria-label="Pin on Pinterest"
+                  >
+                    <span class="icon-pinterest" aria-hidden="true">Pinterest</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Tabs -->
+      <div class="product-tabs">
+        <div class="tabs">
+          <div class="tabs__header">
+            <button 
+              type="button" 
+              class="tabs__button tabs__button--active" 
+              data-tab="description" 
+              aria-selected="true"
+            >
+              Description
+            </button>
+            <button 
+              type="button" 
+              class="tabs__button" 
+              data-tab="details" 
+              aria-selected="false"
+            >
+              Additional Information
+            </button>
+            <button 
+              type="button" 
+              class="tabs__button" 
+              data-tab="reviews" 
+              aria-selected="false"
+            >
+              Reviews
+            </button>
+          </div>
+          <div class="tabs__content">
+            <div class="tabs__panel tabs__panel--active" data-tab-panel="description">
+              <div class="rte">
+                {{ product.description }}
+              </div>
+            </div>
+            <div class="tabs__panel" data-tab-panel="details">
+              <table class="product-details-table">
+                <tbody>
+                  {% if product.vendor != blank %}
+                    <tr>
+                      <th>Brand</th>
+                      <td>{{ product.vendor }}</td>
+                    </tr>
+                  {% endif %}
+                  {% if product.selected_or_first_available_variant.sku != blank %}
+                    <tr>
+                      <th>SKU</th>
+                      <td>{{ product.selected_or_first_available_variant.sku }}</td>
+                    </tr>
+                  {% endif %}
+                  {% if product.type != blank %}
+                    <tr>
+                      <th>Type</th>
+                      <td>{{ product.type }}</td>
+                    </tr>
+                  {% endif %}
+                  {% if product.weight != blank %}
+                    <tr>
+                      <th>Weight</th>
+                      <td>{{ product.weight }} {{ product.weight_unit }}</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+            <div class="tabs__panel" data-tab-panel="reviews" id="reviews">
+              <div class="product-reviews">
+                <div class="product-reviews__summary">
+                  <div class="product-reviews__rating">
+                    <div class="rating-stars rating-stars--large">
+                      <span class="rating-stars__item">★★★★★</span>
+                    </div>
+                    <span class="product-reviews__count">{{ product.metafields.reviews.rating_count | default: 0 }} reviews</span>
+                  </div>
+                </div>
+                <div class="product-reviews__list">
+                  <!-- Placeholder for reviews -->
+                  <p>No reviews yet. Be the first to write a review.</p>
+                </div>
+                <div class="product-reviews__form">
+                  <h3 class="product-reviews__form-title">Write a Review</h3>
+                  <form class="review-form">
+                    <div class="review-form__rating">
+                      <label class="review-form__label">Rating</label>
+                      <div class="review-form__stars">
+                        <input type="radio" id="rating-5" name="rating" value="5" class

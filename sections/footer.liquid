@@ -1,0 +1,159 @@
+<footer class="site-footer">
+  <div class="page-width">
+    <div class="footer-wrapper">
+      <!-- Footer Main Content -->
+      <div class="footer-blocks">
+        <!-- Shop Information -->
+        <div class="footer-block footer-block--info">
+          <h2 class="footer-block__heading">{{ shop.name }}</h2>
+          <div class="footer-block__content rte">
+            {% if settings.footer_text != blank %}
+              {{ settings.footer_text }}
+            {% else %}
+              <p>Share store details, promotions, or brand content with your customers.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-block footer-block--menu">
+          <h2 class="footer-block__heading">Quick Links</h2>
+          <ul class="footer-block__menu list-unstyled">
+            {% for link in linklists.footer.links %}
+              <li>
+                <a href="{{ link.url }}" class="footer-block__link{% if link.active %} footer-block__link--active{% endif %}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Newsletter Signup -->
+        <div class="footer-block footer-block--newsletter">
+          <h2 class="footer-block__heading">Subscribe to our newsletter</h2>
+          <p>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+          {% form 'customer', id: 'ContactFooter' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="newsletter-form">
+              <div class="field">
+                <input
+                  id="NewsletterForm--footer"
+                  type="email"
+                  name="contact[email]"
+                  class="field__input"
+                  value="{{ form.email }}"
+                  aria-required="true"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  placeholder="Email"
+                  required
+                >
+                <label class="field__label" for="NewsletterForm--footer">Email</label>
+              </div>
+              <button type="submit" class="button button--primary" name="commit">
+                Subscribe
+              </button>
+            </div>
+          {% endform %}
+        </div>
+      </div>
+
+      <!-- Social Media Links -->
+      <div class="footer-social">
+        <ul class="footer-social__list list-unstyled list--inline">
+          {% if settings.social_facebook_link != blank %}
+            <li class="footer-social__item">
+              <a href="{{ settings.social_facebook_link }}" class="footer-social__link">
+                <span class="icon-facebook" aria-hidden="true">Facebook</span>
+                <span class="visually-hidden">Facebook</span>
+              </a>
+            </li>
+          {% endif %}
+          {% if settings.social_instagram_link != blank %}
+            <li class="footer-social__item">
+              <a href="{{ settings.social_instagram_link }}" class="footer-social__link">
+                <span class="icon-instagram" aria-hidden="true">Instagram</span>
+                <span class="visually-hidden">Instagram</span>
+              </a>
+            </li>
+          {% endif %}
+          {% if settings.social_twitter_link != blank %}
+            <li class="footer-social__item">
+              <a href="{{ settings.social_twitter_link }}" class="footer-social__link">
+                <span class="icon-twitter" aria-hidden="true">Twitter</span>
+                <span class="visually-hidden">Twitter</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Copyright and Payment Icons -->
+      <div class="footer-bottom">
+        <div class="copyright">
+          <small class="copyright__content">&copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.</small>
+        </div>
+        {% if settings.payment_icons_enabled %}
+          <div class="payment-methods">
+            <span class="visually-hidden">Payment methods</span>
+            <ul class="payment-icons list--inline">
+              {% for type in shop.enabled_payment_types %}
+                <li class="payment-icon">
+                  {{ type | payment_type_svg_tag }}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "footer_text",
+      "label": "Footer text",
+      "default": "<p>Share store details, promotions, or brand content with your customers.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Social media"
+    },
+    {
+      "type": "text",
+      "id": "social_facebook_link",
+      "label": "Facebook",
+      "info": "https://facebook.com/shopify"
+    },
+    {
+      "type": "text",
+      "id": "social_instagram_link",
+      "label": "Instagram",
+      "info": "https://instagram.com/shopify"
+    },
+    {
+      "type": "text",
+      "id": "social_twitter_link",
+      "label": "Twitter",
+      "info": "https://twitter.com/shopify"
+    },
+    {
+      "type": "header",
+      "content": "Payment methods"
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_icons_enabled",
+      "label": "Show payment icons",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

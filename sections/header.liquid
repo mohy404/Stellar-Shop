@@ -1,0 +1,133 @@
+<header class="site-header">
+  <div class="page-width">
+    <div class="header-wrapper">
+      <!-- Logo -->
+      <div class="header-logo">
+        <a href="/" class="header-logo__link">
+          {% if settings.logo != blank %}
+            <img 
+              src="{{ settings.logo | img_url: '150x' }}" 
+              alt="{{ shop.name }}" 
+              class="header-logo__image"
+              width="{{ settings.logo_width }}"
+              loading="lazy">
+          {% else %}
+            <span class="h2">{{ shop.name }}</span>
+          {% endif %}
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="header-nav" role="navigation">
+        <ul class="site-nav list--inline">
+          {% for link in linklists.main-menu.links %}
+            <li class="site-nav__item">
+              <a href="{{ link.url }}" class="site-nav__link{% if link.active %} site-nav__link--active{% endif %}">
+                {{ link.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <!-- Header Actions (Search, Account, Cart) -->
+      <div class="header-actions">
+        <!-- Search -->
+        <div class="header-search">
+          <button type="button" class="btn btn--small search-toggle" aria-expanded="false">
+            <span class="icon-search" aria-hidden="true">🔍</span>
+            <span class="visually-hidden">Search</span>
+          </button>
+          <div class="search-form-wrapper" hidden>
+            <form action="/search" method="get" role="search" class="search-form">
+              <div class="search-form__input-wrapper">
+                <input type="search" name="q" class="search-form__input" placeholder="Search" aria-label="Search">
+                <button type="submit" class="search-form__submit">
+                  <span class="icon-search" aria-hidden="true">🔍</span>
+                  <span class="visually-hidden">Search</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Account -->
+        <a href="/account" class="header-action-link">
+          <span class="icon-account" aria-hidden="true">👤</span>
+          <span class="visually-hidden">Account</span>
+        </a>
+
+        <!-- Cart -->
+        <a href="/cart" class="header-action-link cart-link">
+          <span class="icon-cart" aria-hidden="true">🛒</span>
+          <span class="visually-hidden">Cart</span>
+          <span class="cart-count" data-cart-count>
+            {{ cart.item_count }}
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Toggle -->
+  <button type="button" class="mobile-nav-toggle" aria-expanded="false" aria-controls="MobileNav">
+    <span class="icon-hamburger" aria-hidden="true">☰</span>
+    <span class="visually-hidden">Menu</span>
+  </button>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav-wrapper" hidden id="MobileNav">
+    <nav class="mobile-nav">
+      <ul class="mobile-nav__list">
+        {% for link in linklists.main-menu.links %}
+          <li class="mobile-nav__item">
+            <a href="{{ link.url }}" class="mobile-nav__link{% if link.active %} mobile-nav__link--active{% endif %}">
+              {{ link.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 250,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 100
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  // Toggle search form
+  document.querySelector('.search-toggle').addEventListener('click', function() {
+    const searchForm = document.querySelector('.search-form-wrapper');
+    const isHidden = searchForm.hidden;
+    searchForm.hidden = !isHidden;
+    this.setAttribute('aria-expanded', !isHidden);
+  });
+
+  // Toggle mobile menu
+  document.querySelector('.mobile-nav-toggle').addEventListener('click', function() {
+    const mobileNav = document.getElementById('MobileNav');
+    const isHidden = mobileNav.hidden;
+    mobileNav.hidden = !isHidden;
+    this.setAttribute('aria-expanded', !isHidden);
+  });
+</script>

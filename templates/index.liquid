@@ -1,0 +1,117 @@
+<div class="page-width">
+  <!-- Hero Banner Section -->
+  <div class="hero-banner">
+    <div class="hero-banner__content">
+      <h1 class="hero-banner__title">Welcome to Our Store</h1>
+      <p class="hero-banner__text">Discover our latest collections and exclusive offers</p>
+      <a href="/collections/all" class="button button--primary">Shop Now</a>
+    </div>
+  </div>
+
+  <!-- Featured Collection Section -->
+  <section class="section featured-collection">
+    <div class="section-header">
+      <h2 class="section-title">Featured Collection</h2>
+      <p class="section-subtitle">Shop our most popular products</p>
+    </div>
+    <div class="product-grid">
+      {% assign featured_collection = collections.featured %}
+      {% if featured_collection.empty? or featured_collection.products_count == 0 %}
+        {% assign featured_collection = collections.frontpage %}
+      {% endif %}
+
+      {% if featured_collection.products_count == 0 %}
+        <div class="grid__item">
+          <div class="placeholder-content">
+            <p>No products found in this collection</p>
+          </div>
+        </div>
+      {% else %}
+        {% for product in featured_collection.products limit: 4 %}
+          <div class="grid__item">
+            {% render 'product-card', product: product %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="section-footer">
+      <a href="{{ featured_collection.url }}" class="button button--secondary">View All</a>
+    </div>
+  </section>
+
+  <!-- Promotional Banner -->
+  <section class="section promo-banner">
+    <div class="promo-banner__content">
+      <h2 class="promo-banner__title">Special Offer</h2>
+      <p class="promo-banner__text">Get 20% off on all new arrivals</p>
+      <a href="/collections/new-arrivals" class="button button--primary">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- New Arrivals Section -->
+  <section class="section new-arrivals">
+    <div class="section-header">
+      <h2 class="section-title">New Arrivals</h2>
+      <p class="section-subtitle">Check out our latest products</p>
+    </div>
+    <div class="product-grid">
+      {% assign new_products = collections.all.products | sort: 'created_at' | reverse %}
+      {% for product in new_products limit: 4 %}
+        <div class="grid__item">
+          {% render 'product-card', product: product %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="section-footer">
+      <a href="/collections/all" class="button button--secondary">View All</a>
+    </div>
+  </section>
+
+  <!-- Brand Story Section -->
+  <section class="section brand-story">
+    <div class="brand-story__content">
+      <h2 class="brand-story__title">Our Story</h2>
+      <div class="brand-story__text rte">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id felis et ipsum bibendum ultrices. Morbi vitae pulvinar velit. Sed aliquam dictum sapien, id sagittis augue mattis eu.</p>
+      </div>
+      <a href="/pages/about-us" class="button button--secondary">Learn More</a>
+    </div>
+    <div class="brand-story__image-wrapper">
+      <div class="brand-story__image placeholder-background">
+        <!-- Placeholder for brand image -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="section newsletter">
+    <div class="newsletter__content">
+      <h2 class="newsletter__title">Join Our Mailing List</h2>
+      <p class="newsletter__text">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+      {% form 'customer', id: 'ContactFooter' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="newsletter-form">
+          <div class="field">
+            <input
+              id="NewsletterForm--home"
+              type="email"
+              name="contact[email]"
+              class="field__input"
+              value="{{ form.email }}"
+              aria-required="true"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+              placeholder="Email"
+              required
+            >
+            <label class="field__label" for="NewsletterForm--home">Email</label>
+          </div>
+          <button type="submit" class="button button--primary" name="commit">
+            Subscribe
+          </button>
+        </div>
+      {% endform %}
+    </div>
+  </section>
+</div>

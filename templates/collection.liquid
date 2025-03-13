@@ -1,0 +1,264 @@
+<div class="page-width">
+  <div class="collection-header">
+    <h1 class="collection-title">{{ collection.title }}</h1>
+    {% if collection.description != blank %}
+      <div class="collection-description rte">
+        {{ collection.description }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="collection-toolbar">
+    <!-- Sorting Options -->
+    <div class="collection-toolbar__item collection-toolbar__item--sort">
+      <label for="SortBy" class="visually-hidden">{{ 'collections.sorting.title' | t }}</label>
+      <select name="sort_by" id="SortBy" class="collection-toolbar__select" aria-describedby="a11y-refresh-page-message">
+        {%- for option in collection.sort_options -%}
+          <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected="selected"{% endif %}>
+            {{ option.name }}
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+
+    <!-- View Toggle (Grid/List) -->
+    <div class="collection-toolbar__item collection-toolbar__item--view">
+      <button type="button" class="view-button view-button--grid view-button--active" aria-label="Grid view" data-view="grid">
+        <span class="icon-grid" aria-hidden="true">⊞</span>
+      </button>
+      <button type="button" class="view-button view-button--list" aria-label="List view" data-view="list">
+        <span class="icon-list" aria-hidden="true">☰</span>
+      </button>
+    </div>
+
+    <!-- Filter Toggle (Mobile) -->
+    <div class="collection-toolbar__item collection-toolbar__item--filter">
+      <button type="button" class="filter-toggle" aria-expanded="false" aria-controls="FilterDrawer">
+        <span class="filter-toggle__text">Filter</span>
+        <span class="icon-filter" aria-hidden="true">⚙️</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="collection-layout">
+    <!-- Filters Sidebar -->
+    <div class="collection-filters" id="FilterDrawer">
+      <div class="collection-filters__header">
+        <h2 class="collection-filters__title">Filter</h2>
+        <button type="button" class="collection-filters__close" aria-label="Close filters">
+          <span class="icon-close" aria-hidden="true">✕</span>
+        </button>
+      </div>
+
+      <div class="collection-filters__content">
+        <form id="FilterForm" class="filter-form">
+          <!-- Price Range Filter -->
+          <div class="filter-group">
+            <div class="filter-group__header">
+              <button type="button" class="filter-group__toggle" aria-expanded="true" aria-controls="FilterPrice">
+                <span class="filter-group__title">Price</span>
+                <span class="icon-chevron-down" aria-hidden="true">▼</span>
+              </button>
+            </div>
+            <div id="FilterPrice" class="filter-group__content">
+              <div class="price-range">
+                <div class="price-range__inputs">
+                  <label for="price-min" class="visually-hidden">Minimum price</label>
+                  <input type="number" id="price-min" class="price-range__input" placeholder="$0" min="0">
+                  <span class="price-range__separator">-</span>
+                  <label for="price-max" class="visually-hidden">Maximum price</label>
+                  <input type="number" id="price-max" class="price-range__input" placeholder="$500" min="0">
+                </div>
+                <button type="button" class="button button--small price-range__button">Apply</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Type Filter -->
+          <div class="filter-group">
+            <div class="filter-group__header">
+              <button type="button" class="filter-group__toggle" aria-expanded="true" aria-controls="FilterType">
+                <span class="filter-group__title">Product Type</span>
+                <span class="icon-chevron-down" aria-hidden="true">▼</span>
+              </button>
+            </div>
+            <div id="FilterType" class="filter-group__content">
+              <ul class="filter-options">
+                {% for product_type in collection.all_types %}
+                  <li class="filter-option">
+                    <label class="filter-option__label">
+                      <input type="checkbox" class="filter-option__checkbox" name="product_type" value="{{ product_type | handle }}">
+                      <span class="filter-option__text">{{ product_type }}</span>
+                      <span class="filter-option__count">({{ product_type.count }})</span>
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Vendor Filter -->
+          <div class="filter-group">
+            <div class="filter-group__header">
+              <button type="button" class="filter-group__toggle" aria-expanded="true" aria-controls="FilterVendor">
+                <span class="filter-group__title">Brand</span>
+                <span class="icon-chevron-down" aria-hidden="true">▼</span>
+              </button>
+            </div>
+            <div id="FilterVendor" class="filter-group__content">
+              <ul class="filter-options">
+                {% for vendor in collection.all_vendors %}
+                  <li class="filter-option">
+                    <label class="filter-option__label">
+                      <input type="checkbox" class="filter-option__checkbox" name="vendor" value="{{ vendor | handle }}">
+                      <span class="filter-option__text">{{ vendor }}</span>
+                      <span class="filter-option__count">({{ vendor.count }})</span>
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Clear All Filters -->
+          <div class="filter-actions">
+            <button type="reset" class="filter-actions__clear">Clear all</button>
+            <button type="button" class="button filter-actions__apply">Apply filters</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="collection-products">
+      {% paginate collection.products by 24 %}
+        <div class="product-grid" data-view="grid">
+          {% if collection.products.size == 0 %}
+            <div class="empty-collection">
+              <p>No products found in this collection</p>
+            </div>
+          {% else %}
+            {% for product in collection.products %}
+              <div class="grid__item">
+                {% render 'product-card', product: product %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- Pagination -->
+        {% if paginate.pages > 1 %}
+          <div class="pagination">
+            <ul class="pagination__list">
+              {% if paginate.previous %}
+                <li class="pagination__item pagination__item--prev">
+                  <a href="{{ paginate.previous.url }}" class="pagination__link">
+                    <span class="icon-chevron-left" aria-hidden="true">←</span>
+                    <span class="visually-hidden">Previous page</span>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for part in paginate.parts %}
+                {% if part.is_link %}
+                  <li class="pagination__item">
+                    <a href="{{ part.url }}" class="pagination__link">{{ part.title }}</a>
+                  </li>
+                {% else %}
+                  {% if part.title == paginate.current_page %}
+                    <li class="pagination__item pagination__item--current">
+                      <span class="pagination__current">{{ part.title }}</span>
+                    </li>
+                  {% else %}
+                    <li class="pagination__item pagination__item--text">
+                      <span class="pagination__text">{{ part.title }}</span>
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% if paginate.next %}
+                <li class="pagination__item pagination__item--next">
+                  <a href="{{ paginate.next.url }}" class="pagination__link">
+                    <span class="visually-hidden">Next page</span>
+                    <span class="icon-chevron-right" aria-hidden="true">→</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</div>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+  // ✅ Sort by functionality
+  const sortBySelect = document.getElementById("SortBy");
+  if (sortBySelect) {
+    sortBySelect.addEventListener("change", function () {
+      const url = new URL(window.location.href);
+      url.searchParams.set("sort_by", this.value);
+      window.location.href = url.href; // يمكن تحسينها باستخدام history.pushState
+    });
+  }
+
+  // ✅ View toggle (Grid/List)
+  const viewButtons = document.querySelectorAll(".view-button");
+  const productGrid = document.querySelector(".product-grid");
+
+  if (viewButtons.length > 0 && productGrid) {
+    viewButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const view = this.dataset.view;
+
+        // تحديث الزر النشط
+        viewButtons.forEach((btn) => btn.classList.remove("view-button--active"));
+        this.classList.add("view-button--active");
+
+        // تغيير العرض
+        productGrid.dataset.view = view;
+      });
+    });
+  }
+
+  // ✅ Filter toggle (Mobile)
+  const filterToggle = document.querySelector(".filter-toggle");
+  const filterDrawer = document.getElementById("FilterDrawer");
+
+  if (filterToggle && filterDrawer) {
+    filterToggle.addEventListener("click", function () {
+      filterDrawer.classList.toggle("is-active");
+      this.setAttribute("aria-expanded", filterDrawer.classList.contains("is-active"));
+    });
+  }
+
+  // ✅ Filter group toggles (توسيع وطي الفلاتر)
+  const filterGroupToggles = document.querySelectorAll(".filter-group__toggle");
+
+  if (filterGroupToggles.length > 0) {
+    filterGroupToggles.forEach((toggle) => {
+      toggle.addEventListener("click", function () {
+        const content = document.getElementById(this.getAttribute("aria-controls"));
+        if (content) {
+          const isExpanded = this.getAttribute("aria-expanded") === "true";
+          this.setAttribute("aria-expanded", !isExpanded);
+          content.classList.toggle("is-active", !isExpanded);
+        }
+      });
+    });
+  }
+
+  // ✅ Close filters button
+  const closeFiltersButton = document.querySelector(".collection-filters__close");
+
+  if (closeFiltersButton && filterDrawer) {
+    closeFiltersButton.addEventListener("click", function () {
+      filterDrawer.classList.remove("is-active");
+      if (filterToggle) filterToggle.setAttribute("aria-expanded", "false");
+    });
+  }
+});
+</script>

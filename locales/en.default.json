@@ -1,0 +1,23 @@
+{
+  "general": {
+    "404": {
+      "title": "Page Not Found",
+      "subtext_html": "The page you're looking for is no longer available. Our apologies for the inconvenience.",
+      "home": "Return to Home",
+      "shop": "Continue Shopping"
+    }
+  },
+  "contact": {
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "phone": "Phone Number (Optional)",
+      "message": "How Can We Help?",
+      "send": "Send Message",
+      "post_success": "Thanks for contacting us! We'll get back to you as soon as possible."
+    },
+    "info": {
+      "title": "Get in Touch"
+    }
+  }
+}

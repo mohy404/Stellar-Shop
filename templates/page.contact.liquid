@@ -1,0 +1,117 @@
+<div class="page-width">
+  <div class="contact-page" style="padding: var(--spacing-loose) 0;">
+    <div class="contact-header" style="text-align: center; margin-bottom: var(--spacing-extra-loose);">
+      <h1 style="font-size: 32px; margin-bottom: var(--spacing-base);">{{ page.title }}</h1>
+      {% if page.content != blank %}
+        <div class="rte" style="max-width: 700px; margin: 0 auto; color: var(--color-text-light);">{{ page.content }}</div>
+      {% endif %}
+    </div>
+
+    <div class="contact-grid" style="display: grid; gap: var(--spacing-loose); max-width: 1000px; margin: 0 auto;">
+      <div class="contact-form-wrapper" style="background: var(--color-background); padding: var(--spacing-loose); border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
+        {% form 'contact' %}
+          {% if form.posted_successfully? %}
+            <div class="form-success" style="background: var(--color-success); color: white; padding: var(--spacing-base); border-radius: var(--border-radius); margin-bottom: var(--spacing-loose);">
+              {{ 'contact.form.post_success' | t }}
+            </div>
+          {% endif %}
+
+          {% if form.errors %}
+            <div class="form-error" style="background: var(--color-error); color: white; padding: var(--spacing-base); border-radius: var(--border-radius); margin-bottom: var(--spacing-loose);">
+              {{ form.errors | default_errors }}
+            </div>
+          {% endif %}
+
+          <div class="field" style="margin-bottom: var(--spacing-base);">
+            <input type="text" name="contact[name]" id="ContactFormName" class="field__input" value="{% if form.name %}{{ form.name }}{% endif %}" autocomplete="name" required>
+            <label class="field__label" for="ContactFormName">{{ 'contact.form.name' | t }}</label>
+          </div>
+
+          <div class="field" style="margin-bottom: var(--spacing-base);">
+            <input type="email" name="contact[email]" id="ContactFormEmail" class="field__input" value="{% if form.email %}{{ form.email }}{% endif %}" spellcheck="false" autocomplete="email" required>
+            <label class="field__label" for="ContactFormEmail">{{ 'contact.form.email' | t }}</label>
+          </div>
+
+          <div class="field" style="margin-bottom: var(--spacing-base);">
+            <input type="tel" name="contact[phone]" id="ContactFormPhone" class="field__input" value="{% if form.phone %}{{ form.phone }}{% endif %}" pattern="[0-9\-]*" autocomplete="tel">
+            <label class="field__label" for="ContactFormPhone">{{ 'contact.form.phone' | t }}</label>
+          </div>
+
+          <div class="field" style="margin-bottom: var(--spacing-loose);">
+            <textarea rows="5" name="contact[body]" id="ContactFormMessage" class="field__input" required>{% if form.body %}{{ form.body }}{% endif %}</textarea>
+            <label class="field__label" for="ContactFormMessage">{{ 'contact.form.message' | t }}</label>
+          </div>
+
+          <button type="submit" class="button button--primary button--full-width">{{ 'contact.form.send' | t }}</button>
+        {% endform %}
+      </div>
+
+      <div class="contact-info" style="background: var(--color-background); padding: var(--spacing-loose); border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
+        <div style="margin-bottom: var(--spacing-loose);">
+          <h2 style="font-size: 24px; margin-bottom: var(--spacing-base);">{{ 'contact.info.title' | t }}</h2>
+          {% if settings.contact_address != blank %}
+            <p style="margin-bottom: var(--spacing-base);">
+              <strong>{{ 'contact.info.address' | t }}:</strong><br>
+              {{ settings.contact_address }}
+            </p>
+          {% endif %}
+          {% if settings.contact_email != blank %}
+            <p style="margin-bottom: var(--spacing-base);">
+              <strong>{{ 'contact.info.email' | t }}:</strong><br>
+              <a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
+            </p>
+          {% endif %}
+          {% if settings.contact_phone != blank %}
+            <p style="margin-bottom: var(--spacing-base);">
+              <strong>{{ 'contact.info.phone' | t }}:</strong><br>
+              <a href="tel:{{ settings.contact_phone }}">{{ settings.contact_phone }}</a>
+            </p>
+          {% endif %}
+        </div>
+
+        {% if settings.contact_map_embed != blank %}
+          <div class="contact-map" style="height: 300px; border-radius: var(--border-radius); overflow: hidden;">
+            {{ settings.contact_map_embed }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media screen and (min-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  .contact-form-wrapper {
+    transition: transform 0.3s ease;
+  }
+
+  .contact-form-wrapper:hover {
+    transform: translateY(-5px);
+  }
+
+  .field__input {
+    border: 1px solid var(--color-border);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .field__input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+    outline: none;
+  }
+
+  .contact-info a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .contact-info a:hover {
+    color: var(--color-secondary);
+  }
+</style>
