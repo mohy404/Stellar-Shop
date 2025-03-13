@@ -27,11 +27,19 @@
               {% if product.featured_media != blank %}
                 <img 
                   src="{{ product.featured_media | img_url: '800x' }}" 
+                  srcset="
+                    {{ product.featured_media | img_url: '400x' }} 400w,
+                    {{ product.featured_media | img_url: '800x' }} 800w,
+                    {{ product.featured_media | img_url: '1200x' }} 1200w"
+                  sizes="(max-width: 767px) 100vw, 60vw"
                   alt="{{ product.featured_media.alt | escape }}" 
                   class="product-media__image" 
                   id="ProductMedia-{{ product.featured_media.id }}"
                   data-media-id="{{ product.featured_media.id }}"
-                  loading="lazy"
+                  loading="eager"
+                  width="800"
+                  height="800"
+                  onerror="this.onerror=null; this.src='{{ 'product-1' | placeholder_svg_tag | escape }}'"
                 >
               {% else %}
                 <div class="product-media__image placeholder-background">
@@ -55,6 +63,8 @@
                       alt="{{ media.alt | escape }}" 
                       class="product-media__thumbnail-image"
                       loading="lazy"
+                      width="150"
+                      height="150"
                     >
                   </button>
                 {% endfor %}

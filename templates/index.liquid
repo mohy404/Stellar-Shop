@@ -40,13 +40,11 @@
   </section>
 
   <!-- Promotional Banner -->
-  <section class="section promo-banner">
-    <div class="promo-banner__content">
-      <h2 class="promo-banner__title">Special Offer</h2>
-      <p class="promo-banner__text">Get 20% off on all new arrivals</p>
-      <a href="/collections/new-arrivals" class="button button--primary">Shop Now</a>
-    </div>
-  </section>
+  <div class="special-offer">
+  <h2 class="special-offer__title">Special Offer</h2>
+  <p class="special-offer__text">Get 20% off on all new arrivals</p>
+  <a href="/collections/new-arrivals" class="special-offer__button">Shop Now</a>
+</div>
 
   <!-- New Arrivals Section -->
   <section class="section new-arrivals">
@@ -77,9 +75,20 @@
       <a href="/pages/about-us" class="button button--secondary">Learn More</a>
     </div>
     <div class="brand-story__image-wrapper">
-      <div class="brand-story__image placeholder-background">
-        <!-- Placeholder for brand image -->
-      </div>
+      <img
+        src="{{ 'brand_story_image.jpg' | asset_img_url: '800x' }}"
+        srcset="
+          {{ 'brand_story_image.jpg' | asset_img_url: '400x' }} 400w,
+          {{ 'brand_story_image.jpg' | asset_img_url: '800x' }} 800w,
+          {{ 'brand_story_image.jpg' | asset_img_url: '1200x' }} 1200w"
+        sizes="(max-width: 749px) 100vw, 50vw"
+        alt="Our Brand Story"
+        class="brand-story__image"
+        width="800"
+        height="800"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='{{ 'brand-story-placeholder.svg' | asset_url }}'"
+      >
     </div>
   </section>
 
